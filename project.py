@@ -472,6 +472,20 @@ class Project:
                 if p.returncode != 0:
                     logging.error("transpile failed")
                     exit(1)
+
+                # GHDL cannot emit the GF180 SRAM macro name in a form that
+                # the downstream physical-design flow can use consistently.
+                # Keep the VHDL-facing alias in the source, but resolve it to
+                # the actual physical macro name in the generated netlist.
+                with open(t_full, "r") as fh:
+                    generated = fh.read()
+                generated = generated.replace(
+                    "gf180mcu_fd_ip_sram_sram256x8m8wm1",
+                    "gf180mcu_fd_ip_sram__sram256x8m8wm1",
+                )
+                with open(t_full, "w") as fh:
+                    fh.write(generated)
+
                 new_sources.append(t)
             else:
                 new_sources.append(s)
