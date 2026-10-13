@@ -467,11 +467,25 @@ class Project:
                 s_full = os.path.join(self.src_dir, s)
                 t_full = os.path.join(self.src_dir, t)
                 os.makedirs(os.path.dirname(t_full), exist_ok=True)
-                transpile_cmd = f"ghdl synth -Wno-binding --std=08 --out=verilog {s_full} -e > {t_full}"
+                transpile_cmd = f"ghdl synth -Wno-binding --std=08 --out=verilog {s_full} -e {self.info.top_module} > {t_full}"
                 p = subprocess.run(transpile_cmd, shell=True)
                 if p.returncode != 0:
                     logging.error("transpile failed")
                     exit(1)
+
+                # GHDL cannot emit the GF180 SRAM macro name in a form that
+                # the downstream physical-design flow can use consistently.
+                # Keep the VHDL-facing alias in the source, but resolve it to
+                # the actual physical macro name in the generated netlist.
+                with open(t_full, "r") as fh:
+                    generated = fh.read()
+                generated = generated.replace(
+                    "gf180mcu_fd_ip_sram_sram256x8m8wm1",
+                    "gf180mcu_fd_ip_sram__sram256x8m8wm1",
+                )
+                with open(t_full, "w") as fh:
+                    fh.write(generated)
+
                 new_sources.append(t)
             else:
                 new_sources.append(s)
