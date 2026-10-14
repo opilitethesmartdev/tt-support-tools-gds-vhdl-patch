@@ -190,6 +190,9 @@ class GF180MCUDTech(Tech):
     netlist_type = "pnl"
     project_top_metal_layer = "Metal4"
     librelane_config = {
+        # Temporary workaround for OpenROAD ODB-0445 in post-CTS repair_timing.
+        # Keep the rest of the flow enabled so the next real failure is exposed.
+        "RUN_POST_CTS_RESIZER_TIMING": False,
         # The default configuration is for a 5V supply, but TT targets a 3.3V supply,
         # so we need to adjust the library paths to use the 3.3V libraries.
         "VDD_PIN_VOLTAGE": 3.3,
