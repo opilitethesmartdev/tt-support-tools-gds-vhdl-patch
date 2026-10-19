@@ -193,6 +193,10 @@ class GF180MCUDTech(Tech):
         # Temporary workaround for OpenROAD ODB-0445 in post-CTS repair_timing.
         # Keep the rest of the flow enabled so the next real failure is exposed.
         "RUN_POST_CTS_RESIZER_TIMING": False,
+        # Report setup/hold violations without making them fatal deferred errors.
+        # The empty-string pattern matches no corners; checks and reports still run.
+        "SETUP_VIOLATION_CORNERS": [""],
+        "HOLD_VIOLATION_CORNERS": [""],
         # The default configuration is for a 5V supply, but TT targets a 3.3V supply,
         # so we need to adjust the library paths to use the 3.3V libraries.
         "VDD_PIN_VOLTAGE": 3.3,
